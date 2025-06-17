@@ -1,0 +1,219 @@
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AlertTriangle, Package, TrendingUp, Calendar } from 'lucide-react';
+
+interface SupplyPlanningProps {
+  selectedStore: string;
+  selectedRegion: string;
+}
+
+const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore, selectedRegion }) => {
+  const [timeRange, setTimeRange] = useState('week');
+
+  const demandForecastData = [
+    { date: 'Mon', demand: 850, actual: 820, spoilage: 25 },
+    { date: 'Tue', demand: 920, actual: 890, spoilage: 30 },
+    { date: 'Wed', demand: 1100, actual: 1050, spoilage: 35 },
+    { date: 'Thu', demand: 1200, actual: 1180, spoilage: 40 },
+    { date: 'Fri', demand: 1350, actual: 1320, spoilage: 45 },
+    { date: 'Sat', demand: 1500, actual: 1480, spoilage: 50 },
+    { date: 'Sun', demand: 1300, actual: 1250, spoilage: 48 }
+  ];
+
+  const rawMaterialData = [
+    { material: 'Beef Patties', current: 2400, required: 2800, status: 'critical', reorderPoint: 2000 },
+    { material: 'Buns', current: 3200, required: 3500, status: 'low', reorderPoint: 2500 },
+    { material: 'Lettuce', current: 1800, required: 2000, status: 'good', reorderPoint: 1200 },
+    { material: 'Tomatoes', current: 1500, required: 1600, status: 'good', reorderPoint: 1000 },
+    { material: 'Cheese', current: 800, required: 1200, status: 'critical', reorderPoint: 600 },
+    { material: 'Fries', current: 2200, required: 2400, status: 'good', reorderPoint: 1800 }
+  ];
+
+  const spoilageAnalysis = [
+    { name: 'Vegetables', value: 35, color: '#ef4444' },
+    { name: 'Dairy', value: 25, color: '#f97316' },
+    { name: 'Meat', value: 20, color: '#eab308' },
+    { name: 'Bread', value: 15, color: '#22c55e' },
+    { name: 'Others', value: 5, color: '#6366f1' }
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'critical': return 'bg-red-50 text-red-700 border-red-200';
+      case 'low': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'good': return 'bg-green-50 text-green-700 border-green-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Controls */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-900">Supply Planning & Raw Material Management</h2>
+        <div className="flex space-x-4">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="quarter">This Quarter</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button className="bg-orange-600 hover:bg-orange-700">
+            <Calendar className="w-4 h-4 mr-2" />
+            Generate Plan
+          </Button>
+        </div>
+      </div>
+
+      {/* Demand Forecast vs Actual */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <span>Demand Forecast vs Actual Performance</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={demandForecastData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="demand" stroke="#f97316" strokeWidth={3} name="Forecasted Demand" />
+                <Line type="monotone" dataKey="actual" stroke="#22c55e" strokeWidth={3} name="Actual Demand" />
+                <Line type="monotone" dataKey="spoilage" stroke="#ef4444" strokeWidth={2} name="Spoilage" />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Raw Material Inventory Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Package className="w-5 h-5 text-orange-600" />
+            <span>Raw Material Inventory Status</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Material</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Current Stock</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Required</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Reorder Point</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rawMaterialData.map((item, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium">{item.material}</td>
+                    <td className="py-3 px-4">{item.current.toLocaleString()} units</td>
+                    <td className="py-3 px-4">{item.required.toLocaleString()} units</td>
+                    <td className="py-3 px-4">{item.reorderPoint.toLocaleString()} units</td>
+                    <td className="py-3 px-4">
+                      <Badge variant="outline" className={getStatusColor(item.status)}>
+                        {item.status}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      {item.status === 'critical' && (
+                        <Button size="sm" variant="destructive">Order Now</Button>
+                      )}
+                      {item.status === 'low' && (
+                        <Button size="sm" variant="outline" className="text-yellow-600">Schedule Order</Button>
+                      )}
+                      {item.status === 'good' && (
+                        <span className="text-green-600 text-sm">No Action</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Spoilage Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <span>Spoilage Analysis by Category</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={spoilageAnalysis}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  {spoilageAnalysis.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Supply Chain Alerts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-red-800">Critical Stock Alert</p>
+                  <p className="text-sm text-red-600">Beef patties below critical level. Order required within 24 hours.</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-yellow-800">High Spoilage Risk</p>
+                  <p className="text-sm text-yellow-600">Vegetables showing increased spoilage pattern this week.</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <Package className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-blue-800">Delivery Schedule</p>
+                  <p className="text-sm text-blue-600">Next delivery from RDC scheduled for tomorrow 8:00 AM.</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default SupplyPlanningDashboard;
