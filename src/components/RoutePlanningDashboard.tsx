@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter } from 'recharts';
 import { MapPin, Truck, Route, Clock, Fuel, Navigation } from 'lucide-react';
+import BangaloreRouteMap from './BangaloreRouteMap';
 
 interface RoutePlanningProps {
   selectedStore: string;
@@ -125,6 +125,9 @@ const RoutePlanningDashboard: React.FC<RoutePlanningProps> = ({ selectedStore, s
           </Button>
         </div>
       </div>
+
+      {/* Bangalore Interactive Map */}
+      <BangaloreRouteMap />
 
       {/* Route Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

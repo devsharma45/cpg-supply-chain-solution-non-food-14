@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { AlertTriangle, Package, TrendingUp, Calendar } from 'lucide-react';
+import SupplyPlanningChatbot from './SupplyPlanningChatbot';
 
 interface SupplyPlanningProps {
   selectedStore: string;
@@ -74,29 +74,34 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
         </div>
       </div>
 
-      {/* Demand Forecast vs Actual */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="col-span-1 lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              <span>Demand Forecast vs Actual Performance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={demandForecastData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="demand" stroke="#f97316" strokeWidth={3} name="Forecasted Demand" />
-                <Line type="monotone" dataKey="actual" stroke="#22c55e" strokeWidth={3} name="Actual Demand" />
-                <Line type="monotone" dataKey="spoilage" stroke="#ef4444" strokeWidth={2} name="Spoilage" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      {/* Add Chatbot Integration */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card className="col-span-1 lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <span>Demand Forecast vs Actual Performance</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={demandForecastData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="demand" stroke="#f97316" strokeWidth={3} name="Forecasted Demand" />
+                  <Line type="monotone" dataKey="actual" stroke="#22c55e" strokeWidth={3} name="Actual Demand" />
+                  <Line type="monotone" dataKey="spoilage" stroke="#ef4444" strokeWidth={2} name="Spoilage" />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-1">
+          <SupplyPlanningChatbot />
+        </div>
       </div>
 
       {/* Raw Material Inventory Status */}
@@ -105,6 +110,9 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
           <CardTitle className="flex items-center space-x-2">
             <Package className="w-5 h-5 text-orange-600" />
             <span>Raw Material Inventory Status</span>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              SAP Integrated
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -117,7 +125,7 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Required</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Reorder Point</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Action</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">SAP Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,13 +142,17 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
                     </td>
                     <td className="py-3 px-4">
                       {item.status === 'critical' && (
-                        <Button size="sm" variant="destructive">Order Now</Button>
+                        <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+                          Create SAP PO
+                        </Button>
                       )}
                       {item.status === 'low' && (
-                        <Button size="sm" variant="outline" className="text-yellow-600">Schedule Order</Button>
+                        <Button size="sm" variant="outline" className="text-orange-600 border-orange-300">
+                          Schedule SAP Order
+                        </Button>
                       )}
                       {item.status === 'good' && (
-                        <span className="text-green-600 text-sm">No Action</span>
+                        <span className="text-green-600 text-sm">Auto-Managed</span>
                       )}
                     </td>
                   </tr>
@@ -183,29 +195,26 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
 
         <Card>
           <CardHeader>
-            <CardTitle>Supply Chain Alerts</CardTitle>
+            <CardTitle>Supply Chain Alerts & SAP Integration</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
                 <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
-                <div>
+                <div className="flex-1">
                   <p className="font-medium text-red-800">Critical Stock Alert</p>
-                  <p className="text-sm text-red-600">Beef patties below critical level. Order required within 24 hours.</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                <div>
-                  <p className="font-medium text-yellow-800">High Spoilage Risk</p>
-                  <p className="text-sm text-yellow-600">Vegetables showing increased spoilage pattern this week.</p>
+                  <p className="text-sm text-red-600">Beef patties below critical level. SAP PO auto-generated.</p>
+                  <Button size="sm" className="mt-2 bg-red-600 hover:bg-red-700 text-white">
+                    View SAP Order #PO789123
+                  </Button>
                 </div>
               </div>
               <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <Package className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="font-medium text-blue-800">Delivery Schedule</p>
-                  <p className="text-sm text-blue-600">Next delivery from RDC scheduled for tomorrow 8:00 AM.</p>
+                <div className="flex-1">
+                  <p className="font-medium text-blue-800">SAP Integration Active</p>
+                  <p className="text-sm text-blue-600">Real-time sync with SAP MM module enabled. Last sync: 2 min ago</p>
+                  <Badge className="mt-1 bg-green-100 text-green-800">Connected</Badge>
                 </div>
               </div>
             </div>
