@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { AlertTriangle, Package, TrendingUp, Calendar } from 'lucide-react';
+import { AlertTriangle, Package, TrendingUp, Calendar, Filter } from 'lucide-react';
 import SupplyPlanningChatbot from './SupplyPlanningChatbot';
 
 interface SupplyPlanningProps {
@@ -14,16 +14,46 @@ interface SupplyPlanningProps {
 
 const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore, selectedRegion }) => {
   const [timeRange, setTimeRange] = useState('week');
+  const [selectedProduct, setSelectedProduct] = useState('all');
 
-  const demandForecastData = [
-    { date: 'Mon', demand: 850, actual: 820, spoilage: 25 },
-    { date: 'Tue', demand: 920, actual: 890, spoilage: 30 },
-    { date: 'Wed', demand: 1100, actual: 1050, spoilage: 35 },
-    { date: 'Thu', demand: 1200, actual: 1180, spoilage: 40 },
-    { date: 'Fri', demand: 1350, actual: 1320, spoilage: 45 },
-    { date: 'Sat', demand: 1500, actual: 1480, spoilage: 50 },
-    { date: 'Sun', demand: 1300, actual: 1250, spoilage: 48 }
-  ];
+  const demandForecastData = {
+    all: [
+      { date: 'Mon', demand: 850, actual: 820, spoilage: 25 },
+      { date: 'Tue', demand: 920, actual: 890, spoilage: 30 },
+      { date: 'Wed', demand: 1100, actual: 1050, spoilage: 35 },
+      { date: 'Thu', demand: 1200, actual: 1180, spoilage: 40 },
+      { date: 'Fri', demand: 1350, actual: 1320, spoilage: 45 },
+      { date: 'Sat', demand: 1500, actual: 1480, spoilage: 50 },
+      { date: 'Sun', demand: 1300, actual: 1250, spoilage: 48 }
+    ],
+    whopper: [
+      { date: 'Mon', demand: 320, actual: 310, spoilage: 8 },
+      { date: 'Tue', demand: 340, actual: 335, spoilage: 10 },
+      { date: 'Wed', demand: 410, actual: 400, spoilage: 12 },
+      { date: 'Thu', demand: 450, actual: 445, spoilage: 15 },
+      { date: 'Fri', demand: 520, actual: 510, spoilage: 18 },
+      { date: 'Sat', demand: 580, actual: 570, spoilage: 20 },
+      { date: 'Sun', demand: 480, actual: 470, spoilage: 16 }
+    ],
+    fries: [
+      { date: 'Mon', demand: 280, actual: 275, spoilage: 5 },
+      { date: 'Tue', demand: 300, actual: 295, spoilage: 6 },
+      { date: 'Wed', demand: 360, actual: 350, spoilage: 8 },
+      { date: 'Thu', demand: 390, actual: 385, spoilage: 10 },
+      { date: 'Fri', demand: 440, actual: 430, spoilage: 12 },
+      { date: 'Sat', demand: 480, actual: 475, spoilage: 14 },
+      { date: 'Sun', demand: 420, actual: 410, spoilage: 11 }
+    ],
+    chicken: [
+      { date: 'Mon', demand: 250, actual: 235, spoilage: 12 },
+      { date: 'Tue', demand: 280, actual: 260, spoilage: 14 },
+      { date: 'Wed', demand: 330, actual: 300, spoilage: 15 },
+      { date: 'Thu', demand: 360, actual: 350, spoilage: 15 },
+      { date: 'Fri', demand: 390, actual: 380, spoilage: 15 },
+      { date: 'Sat', demand: 440, actual: 435, spoilage: 16 },
+      { date: 'Sun', demand: 400, actual: 375, spoilage: 21 }
+    ]
+  };
 
   const rawMaterialData = [
     { material: 'Beef Patties', current: 2400, required: 2800, status: 'critical', reorderPoint: 2000 },
@@ -79,14 +109,30 @@ const SupplyPlanningDashboard: React.FC<SupplyPlanningProps> = ({ selectedStore,
         <div className="lg:col-span-2">
           <Card className="col-span-1 lg:col-span-2">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                <span>Demand Forecast vs Actual Performance</span>
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <span>Demand Forecast vs Actual Performance</span>
+                </CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-gray-500" />
+                  <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Products</SelectItem>
+                      <SelectItem value="whopper">Whopper</SelectItem>
+                      <SelectItem value="fries">Fries</SelectItem>
+                      <SelectItem value="chicken">Chicken</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={demandForecastData}>
+                <LineChart data={demandForecastData[selectedProduct as keyof typeof demandForecastData]}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis dataKey="date" />
                   <YAxis />

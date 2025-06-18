@@ -6,8 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Send, Bot, User, ExternalLink } from 'lucide-react';
 
+interface SapAction {
+  type: string;
+  material?: string;
+  quantity?: number;
+  orderValue?: string;
+  materials?: string[];
+  adjustment?: string;
+}
+
+interface Message {
+  type: 'bot' | 'user';
+  content: string;
+  timestamp: Date;
+  sapAction?: SapAction;
+}
+
 const SupplyPlanningChatbot = () => {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
       type: 'bot',
       content: 'Hello! I can help you with supply planning questions. Ask me about inventory levels, demand forecasts, or SAP integration.',
@@ -20,8 +36,8 @@ const SupplyPlanningChatbot = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const userMessage = {
-      type: 'user' as const,
+    const userMessage: Message = {
+      type: 'user',
       content: inputMessage,
       timestamp: new Date()
     };
@@ -34,7 +50,7 @@ const SupplyPlanningChatbot = () => {
     setTimeout(() => {
       const botResponse = generateBotResponse(inputMessage);
       setMessages(prev => [...prev, {
-        type: 'bot' as const,
+        type: 'bot',
         content: botResponse.content,
         timestamp: new Date(),
         sapAction: botResponse.sapAction
@@ -78,11 +94,11 @@ const SupplyPlanningChatbot = () => {
     }
   };
 
-  const handleSapAction = (action: any) => {
+  const handleSapAction = (action: SapAction) => {
     console.log('Initiating SAP action:', action);
     // In real implementation, this would trigger SAP integration
     setMessages(prev => [...prev, {
-      type: 'bot' as const,
+      type: 'bot',
       content: `SAP integration initiated. ${action.type === 'purchase_order' ? 'Purchase order' : 'Forecast adjustment'} request sent to SAP system. Reference ID: SAP-${Date.now()}`,
       timestamp: new Date()
     }]);
@@ -119,7 +135,7 @@ const SupplyPlanningChatbot = () => {
                           size="sm" 
                           variant="outline" 
                           className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
-                          onClick={() => handleSapAction(message.sapAction)}
+                          onClick={() => handleSapAction(message.sapAction!)}
                         >
                           <ExternalLink className="w-3 h-3 mr-1" />
                           Execute in SAP
