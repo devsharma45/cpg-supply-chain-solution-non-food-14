@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, MapPin, Truck, Package, BarChart3, Warehouse } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, MapPin, Truck, Package, BarChart3, Warehouse, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SupplyPlanningDashboard from '@/components/SupplyPlanningDashboard';
 import RepurchaseTool from '@/components/RepurchaseTool';
@@ -31,6 +31,12 @@ const Index = () => {
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
+              <Link to="/banking">
+                <Button variant="outline" className="flex items-center space-x-2">
+                  <DollarSign className="w-4 h-4" />
+                  <span>Banking Dashboard</span>
+                </Button>
+              </Link>
               <Link to="/warehouse">
                 <Button variant="outline" className="flex items-center space-x-2">
                   <Warehouse className="w-4 h-4" />
