@@ -13,6 +13,7 @@ import CashPositionBreakdown from '@/components/banking/CashPositionBreakdown';
 import InflowOutflowAnalysis from '@/components/banking/InflowOutflowAnalysis';
 import BankingChatbot from '@/components/banking/BankingChatbot';
 import ComplianceAlerts from '@/components/banking/ComplianceAlerts';
+import DailyRecommendations from '@/components/banking/DailyRecommendations';
 
 const BankingDashboard = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('daily');
@@ -25,8 +26,8 @@ const BankingDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-2 rounded-lg font-bold text-xl">
-                Cash Flow Management
+              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg font-bold text-xl">
+                Hong Leong Bank - Cash Flow Management
               </div>
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                 Live Dashboard
@@ -56,10 +57,11 @@ const BankingDashboard = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="north">North</SelectItem>
-                  <SelectItem value="south">South</SelectItem>
-                  <SelectItem value="east">East</SelectItem>
-                  <SelectItem value="west">West</SelectItem>
+                  <SelectItem value="klang-valley">Klang Valley</SelectItem>
+                  <SelectItem value="northern">Northern Region</SelectItem>
+                  <SelectItem value="southern">Southern Region</SelectItem>
+                  <SelectItem value="east-coast">East Coast</SelectItem>
+                  <SelectItem value="east-malaysia">East Malaysia</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -71,10 +73,14 @@ const BankingDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-white shadow-sm">
             <TabsTrigger value="overview" className="flex items-center space-x-2">
               <DollarSign className="w-4 h-4" />
               <span>Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex items-center space-x-2">
+              <Zap className="w-4 h-4" />
+              <span>Daily Recs</span>
             </TabsTrigger>
             <TabsTrigger value="forecasting" className="flex items-center space-x-2">
               <TrendingUp className="w-4 h-4" />
@@ -100,6 +106,10 @@ const BankingDashboard = () => {
 
           <TabsContent value="overview">
             <CashFlowOverview timeframe={selectedTimeframe} region={selectedRegion} />
+          </TabsContent>
+
+          <TabsContent value="recommendations">
+            <DailyRecommendations timeframe={selectedTimeframe} region={selectedRegion} />
           </TabsContent>
 
           <TabsContent value="forecasting">

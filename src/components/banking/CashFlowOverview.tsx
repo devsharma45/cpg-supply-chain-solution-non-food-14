@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, DollarSign, Zap } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TrendingUp, TrendingDown, AlertTriangle, DollarSign, Zap, Filter } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface CashFlowOverviewProps {
   timeframe: string;
@@ -11,7 +13,9 @@ interface CashFlowOverviewProps {
 }
 
 const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }) => {
-  // Mock data for cash flow overview
+  const [flowFilter, setFlowFilter] = useState('both');
+
+  // Malaysian context mock data
   const dailyFlowData = [
     { date: '2024-01-15', inflow: 2500, outflow: 1800, net: 700 },
     { date: '2024-01-16', inflow: 2800, outflow: 2100, net: 700 },
@@ -22,10 +26,28 @@ const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }
     { date: '2024-01-21', inflow: 2700, outflow: 2300, net: 400 }
   ];
 
+  const inflowBreakdown = [
+    { name: 'Government Salaries', value: 450, color: '#10b981' },
+    { name: 'Corporate Deposits', value: 680, color: '#3b82f6' },
+    { name: 'SME Loan Repayments', value: 320, color: '#8b5cf6' },
+    { name: 'Retail Deposits', value: 280, color: '#f59e0b' },
+    { name: 'Investment Returns', value: 150, color: '#ef4444' },
+    { name: 'Inter-bank Receipts', value: 120, color: '#06b6d4' }
+  ];
+
+  const outflowBreakdown = [
+    { name: 'Loan Disbursements', value: 580, color: '#ef4444' },
+    { name: 'ATM Cash Replenishment', value: 320, color: '#f59e0b' },
+    { name: 'Operational Expenses', value: 280, color: '#8b5cf6' },
+    { name: 'Customer Withdrawals', value: 420, color: '#06b6d4' },
+    { name: 'Inter-bank Payments', value: 180, color: '#84cc16' },
+    { name: 'CNY Bonus Payouts', value: 220, color: '#f97316' }
+  ];
+
   const kpiData = [
     {
       title: 'Net Cash Position',
-      value: '₹4,250 Cr',
+      value: 'RM 4,250M',
       change: '+12.5%',
       trend: 'up',
       description: 'vs last period'
@@ -35,11 +57,11 @@ const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }
       value: '142%',
       change: '+3.2%',
       trend: 'up',
-      description: 'Above regulatory minimum'
+      description: 'Above BNM minimum (100%)'
     },
     {
       title: 'Cash Burn Rate',
-      value: '₹850 Cr/day',
+      value: 'RM 850M/day',
       change: '-5.1%',
       trend: 'down',
       description: 'Average daily outflow'
@@ -54,10 +76,16 @@ const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }
   ];
 
   const alerts = [
-    { type: 'warning', message: 'ATM cash below threshold in 15 locations', priority: 'Medium' },
-    { type: 'info', message: 'Surplus cash available for investment: ₹320 Cr', priority: 'Low' },
-    { type: 'error', message: 'LCR approaching minimum in Western region', priority: 'High' }
+    { type: 'warning', message: 'ATM cash below threshold in 15 locations (Klang Valley)', priority: 'Medium' },
+    { type: 'info', message: 'CNY period - surplus cash available for investment: RM 320M', priority: 'Low' },
+    { type: 'error', message: 'LCR approaching BNM minimum in East Malaysia region', priority: 'High' }
   ];
+
+  const getFilteredData = () => {
+    if (flowFilter === 'inflow') return inflowBreakdown;
+    if (flowFilter === 'outflow') return outflowBreakdown;
+    return [...inflowBreakdown, ...outflowBreakdown];
+  };
 
   return (
     <div className="space-y-6">
@@ -94,7 +122,7 @@ const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }
         {/* Daily Cash Flow Trend */}
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900">Daily Cash Flow Trend</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">Daily Cash Flow Trend (Malaysian Context)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -103,40 +131,101 @@ const CashFlowOverview: React.FC<CashFlowOverviewProps> = ({ timeframe, region }
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="inflow" stroke="#10b981" strokeWidth={2} name="Inflow" />
-                <Line type="monotone" dataKey="outflow" stroke="#ef4444" strokeWidth={2} name="Outflow" />
-                <Line type="monotone" dataKey="net" stroke="#3b82f6" strokeWidth={3} name="Net Position" />
+                <Line type="monotone" dataKey="inflow" stroke="#10b981" strokeWidth={2} name="Inflow (RM M)" />
+                <Line type="monotone" dataKey="outflow" stroke="#ef4444" strokeWidth={2} name="Outflow (RM M)" />
+                <Line type="monotone" dataKey="net" stroke="#3b82f6" strokeWidth={3} name="Net Position (RM M)" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Inflow vs Outflow Comparison */}
+        {/* Inflow/Outflow Breakdown with Filter */}
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900">Today's Flow Breakdown</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-gray-900">Cash Flow Breakdown</CardTitle>
+              <Select value={flowFilter} onValueChange={setFlowFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="both">Both</SelectItem>
+                  <SelectItem value="inflow">Inflow Only</SelectItem>
+                  <SelectItem value="outflow">Outflow Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dailyFlowData.slice(-1)}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="inflow" fill="#10b981" name="Inflow (₹ Cr)" />
-                <Bar dataKey="outflow" fill="#ef4444" name="Outflow (₹ Cr)" />
-              </BarChart>
+              <PieChart>
+                <Pie
+                  data={getFilteredData()}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: RM ${value}M`}
+                >
+                  {getFilteredData().map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => [`RM ${value}M`, 'Amount']} />
+              </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Real-time Alerts */}
+      {/* Detailed Breakdown Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-green-900">Inflow Sources (Malaysian Context)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {inflowBreakdown.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-2 rounded border border-green-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-sm text-gray-700">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">RM {item.value}M</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-red-900">Outflow Destinations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {outflowBreakdown.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-2 rounded border border-red-100">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-sm text-gray-700">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">RM {item.value}M</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Malaysian-Specific Alerts */}
       <Card className="bg-white shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
             <AlertTriangle className="w-5 h-5 text-orange-500" />
-            <span>Real-time Alerts</span>
+            <span>Real-time Alerts (Malaysian Banking Context)</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
