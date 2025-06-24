@@ -43,6 +43,12 @@ const Index = () => {
                   <span>Warehouse Manager</span>
                 </Button>
               </Link>
+              <Link to="/fleet">
+                <Button variant="outline" className="flex items-center space-x-2">
+                  <Truck className="w-4 h-4" />
+                  <span>Fleet Optimizer</span>
+                </Button>
+              </Link>
               <Select value={selectedRegion} onValueChange={setSelectedRegion}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Select Region" />
