@@ -16,7 +16,7 @@ import HistoricalRoutePerformance from '@/components/fleet/HistoricalRoutePerfor
 import { useToast } from '@/hooks/use-toast';
 
 const FleetOptimizerPage = () => {
-  const [numOutlets, setNumOutlets] = useState(6);
+  const numOutlets = 6; // Fixed number of outlets
   const [timeWindow, setTimeWindow] = useState('Today');
   const [selectedOutlet, setSelectedOutlet] = useState('all');
   const [selectedRoute, setSelectedRoute] = useState('all');
@@ -57,18 +57,6 @@ const FleetOptimizerPage = () => {
                   <span>Main Dashboard</span>
                 </Button>
               </Link>
-              <Select value={numOutlets.toString()} onValueChange={(value) => setNumOutlets(parseInt(value))}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Number of Outlets" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[...Array(19)].map((_, i) => (
-                    <SelectItem key={i + 2} value={(i + 2).toString()}>
-                      {i + 2} Outlets
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>

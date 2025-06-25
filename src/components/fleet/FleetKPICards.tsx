@@ -9,26 +9,36 @@ interface FleetKPICardsProps {
 
 const FleetKPICards = ({ numOutlets }: FleetKPICardsProps) => {
   const kpiData = useMemo(() => {
-    // Calculate total trucks needed (simplified)
-    const totalTrucks = Math.ceil(numOutlets / 3); // Rough estimate
+    // Calculate fleet composition (small, medium, large trucks)
+    const smallTrucks = Math.ceil(numOutlets * 0.3);
+    const mediumTrucks = Math.ceil(numOutlets * 0.5);
+    const largeTrucks = Math.ceil(numOutlets * 0.2);
+    const totalFleetSize = smallTrucks + mediumTrucks + largeTrucks;
     
-    // Calculate average load factor
-    const avgLoadFactor = 65 + Math.random() * 25; // 65-90%
+    // Calculate average load factor per route (3 routes: A, B, C)
+    const avgLoadFactorPerRoute = 65 + Math.random() * 25; // 65-90%
     
-    // Calculate total cost
-    const totalCost = totalTrucks * 120; // RM per truck per route
+    // Calculate average delivery cost per route
+    const avgDeliveryCostPerRoute = 120 + Math.random() * 50; // RM 120-170 per route
     
-    // Calculate route performance
-    const totalDrops = numOutlets;
-    const totalDistance = numOutlets * (Math.random() * 20 + 10); // 10-30km per outlet
-    const dropDensity = totalDrops / totalDistance;
+    // Calculate average distance per route
+    const avgDistancePerRoute = (numOutlets * (Math.random() * 20 + 10)) / 3; // Total distance divided by 3 routes
+    
+    // Calculate average outlets per route
+    const avgOutletsPerRoute = numOutlets / 3;
+    
+    // Calculate drop density (outlets per km)
+    const dropDensity = avgOutletsPerRoute / avgDistancePerRoute;
     
     return {
-      totalTrucks,
-      avgLoadFactor: Math.round(avgLoadFactor * 10) / 10,
-      totalCost,
-      totalDrops,
-      totalDistance: Math.round(totalDistance),
+      totalFleetSize,
+      smallTrucks,
+      mediumTrucks,
+      largeTrucks,
+      avgLoadFactorPerRoute: Math.round(avgLoadFactorPerRoute * 10) / 10,
+      avgDeliveryCostPerRoute: Math.round(avgDeliveryCostPerRoute),
+      avgDistancePerRoute: Math.round(avgDistancePerRoute),
+      avgOutletsPerRoute: Math.round(avgOutletsPerRoute * 10) / 10,
       dropDensity: Math.round(dropDensity * 100) / 100,
     };
   }, [numOutlets]);
@@ -37,12 +47,14 @@ const FleetKPICards = ({ numOutlets }: FleetKPICardsProps) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">🚛 Total Trucks</CardTitle>
+          <CardTitle className="text-sm font-medium">🚛 Total Fleet Size</CardTitle>
           <Truck className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{kpiData.totalTrucks}</div>
-          <p className="text-xs text-muted-foreground">Vehicles required</p>
+          <div className="text-2xl font-bold">{kpiData.totalFleetSize}</div>
+          <p className="text-xs text-muted-foreground">
+            S:{kpiData.smallTrucks} M:{kpiData.mediumTrucks} L:{kpiData.largeTrucks}
+          </p>
         </CardContent>
       </Card>
 
@@ -52,41 +64,41 @@ const FleetKPICards = ({ numOutlets }: FleetKPICardsProps) => {
           <Package className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{kpiData.avgLoadFactor}%</div>
-          <p className="text-xs text-muted-foreground">Capacity utilization</p>
+          <div className="text-2xl font-bold">{kpiData.avgLoadFactorPerRoute}%</div>
+          <p className="text-xs text-muted-foreground">Per route</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">💸 Est. Delivery Cost</CardTitle>
+          <CardTitle className="text-sm font-medium">💸 Avg Delivery Cost</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">RM {kpiData.totalCost}</div>
-          <p className="text-xs text-muted-foreground">Total route cost</p>
+          <div className="text-2xl font-bold">RM {kpiData.avgDeliveryCostPerRoute}</div>
+          <p className="text-xs text-muted-foreground">Per route</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">📍 Total Drops</CardTitle>
-          <MapPin className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{kpiData.totalDrops}</div>
-          <p className="text-xs text-muted-foreground">Delivery points</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">🛣️ Total Distance</CardTitle>
+          <CardTitle className="text-sm font-medium">🛣️ Avg Distance</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{kpiData.totalDistance} km</div>
-          <p className="text-xs text-muted-foreground">Route distance</p>
+          <div className="text-2xl font-bold">{kpiData.avgDistancePerRoute} km</div>
+          <p className="text-xs text-muted-foreground">Per route</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">📍 Avg Outlets</CardTitle>
+          <MapPin className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{kpiData.avgOutletsPerRoute}</div>
+          <p className="text-xs text-muted-foreground">Per route</p>
         </CardContent>
       </Card>
 
@@ -97,7 +109,7 @@ const FleetKPICards = ({ numOutlets }: FleetKPICardsProps) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{kpiData.dropDensity}</div>
-          <p className="text-xs text-muted-foreground">Drops per km</p>
+          <p className="text-xs text-muted-foreground">Outlets per km</p>
         </CardContent>
       </Card>
     </div>
